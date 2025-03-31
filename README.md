@@ -1,32 +1,26 @@
-# Modern Pokedex
+# Modern Pokédex
 
-A modern, interactive Pokedex web application that displays Pokemon information with their associated Magic: The Gathering cards.
+A modern, minimalistic Pokédex web application that displays information about all Pokémon from the PokeAPI.
 
 ## Features
 
-- Display all Pokemon with their sprites and MTG cards (where available)
-- Search Pokemon by name
-- Filter Pokemon by type
-- View detailed information in a modal window
+- Display all Pokémon in a clean, card-based interface
+- Search Pokémon by name
+- Filter Pokémon by type
+- View detailed information including:
+  - Stats
+  - Evolution chain
+  - Key moves
+  - Description
 - Interactive evolution chain navigation
 - Responsive design
-- Modern, minimalistic UI
+- Modern UI with smooth animations
 
-## Technologies Used
-
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-- Node.js
-- Express.js
-- PokeAPI
-- Scryfall API (for MTG cards)
-
-## Getting Started
+## Setup
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/pokedex.git
+git clone https://github.com/saltybm/pokedex.git
 cd pokedex
 ```
 
@@ -40,13 +34,20 @@ npm install
 npm start
 ```
 
-4. Open your browser and navigate to `http://localhost:3000`
+4. Open your browser and navigate to:
+```
+http://localhost:3001
+```
 
-## API Credits
+## Technologies Used
 
-- Pokemon data from [PokeAPI](https://pokeapi.co/)
-- MTG card images from [Scryfall](https://scryfall.com/)
+- HTML5
+- CSS3
+- JavaScript (ES6+)
+- Node.js
+- Express.js
+- PokeAPI
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+MIT License 

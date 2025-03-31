@@ -1,65 +1,6 @@
 const POKE_API_BASE_URL = 'https://pokeapi.co/api/v2';
-const SCRYFALL_API_URL = 'https://api.scryfall.com/cards/named';
 let allPokemon = [];
 let filteredPokemon = [];
-
-// Pokemon to MTG card mapping
-const pokemonToMTG = {
-    'charizard': 'Charizard',
-    'pikachu': 'Pikachu',
-    'mewtwo': 'Mewtwo',
-    'mew': 'Mew',
-    'dragonite': 'Dragonite',
-    'gyarados': 'Gyarados',
-    'lapras': 'Lapras',
-    'snorlax': 'Snorlax',
-    'venusaur': 'Venusaur',
-    'blastoise': 'Blastoise',
-    'alakazam': 'Alakazam',
-    'gengar': 'Gengar',
-    'arcanine': 'Arcanine',
-    'ninetales': 'Ninetales',
-    'raichu': 'Raichu',
-    'machamp': 'Machamp',
-    'golem': 'Golem',
-    'onix': 'Onix',
-    'hitmonlee': 'Hitmonlee',
-    'hitmonchan': 'Hitmonchan',
-    'mr-mime': 'Mr. Mime',
-    'jynx': 'Jynx',
-    'electrode': 'Electrode',
-    'exeggutor': 'Exeggutor',
-    'marowak': 'Marowak',
-    'hitmontop': 'Hitmontop',
-    'lickitung': 'Lickitung',
-    'koffing': 'Koffing',
-    'rhyhorn': 'Rhyhorn',
-    'chansey': 'Chansey',
-    'tangela': 'Tangela',
-    'kangaskhan': 'Kangaskhan',
-    'horsea': 'Horsea',
-    'goldeen': 'Goldeen',
-    'staryu': 'Staryu',
-    'scyther': 'Scyther',
-    'jolteon': 'Jolteon',
-    'electabuzz': 'Electabuzz',
-    'magmar': 'Magmar',
-    'pinsir': 'Pinsir',
-    'tauros': 'Tauros',
-    'ditto': 'Ditto',
-    'eevee': 'Eevee',
-    'porygon': 'Porygon',
-    'omanyte': 'Omanyte',
-    'kabuto': 'Kabuto',
-    'aerodactyl': 'Aerodactyl',
-    'articuno': 'Articuno',
-    'zapdos': 'Zapdos',
-    'moltres': 'Moltres',
-    'dratini': 'Dratini',
-    'dragonair': 'Dragonair',
-    'mewtwo': 'Mewtwo',
-    'mew': 'Mew'
-};
 
 // DOM Elements
 const pokemonGrid = document.getElementById('pokemonGrid');
@@ -68,6 +9,11 @@ const typeFilter = document.getElementById('typeFilter');
 const modal = document.getElementById('pokemonModal');
 const modalContent = document.getElementById('modalContent');
 const closeBtn = document.querySelector('.close');
+
+// Helper function to capitalize first letter
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 // Event Listeners
 searchInput.addEventListener('input', filterPokemon);
@@ -90,7 +36,7 @@ async function fetchAllPokemon() {
         const data = await allPokemonResponse.json();
         
         // Show loading message
-        pokemonGrid.innerHTML = '<div style="text-align: center; padding: 20px;">Loading Pokemon... This may take a few minutes.</div>';
+        pokemonGrid.innerHTML = '<div style="text-align: center; padding: 20px;">Loading Pokémon... This may take a few minutes.</div>';
         
         // Fetch details for all Pokemon
         allPokemon = await Promise.all(
@@ -106,7 +52,7 @@ async function fetchAllPokemon() {
         displayPokemon();
     } catch (error) {
         console.error('Error fetching Pokemon:', error);
-        pokemonGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Error loading Pokemon. Please try again later.</div>';
+        pokemonGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Error loading Pokémon. Please try again later.</div>';
     }
 }
 
@@ -175,27 +121,8 @@ function displayPokemon() {
     });
 }
 
-// Fetch MTG card image
-async function fetchMTGCard(pokemonName) {
-    try {
-        const mtgName = pokemonToMTG[pokemonName.toLowerCase()];
-        if (!mtgName) return null;
-
-        const response = await fetch(`${SCRYFALL_API_URL}?exact=${encodeURIComponent(mtgName)}`);
-        const data = await response.json();
-        
-        if (data.object === 'card') {
-            return data.image_uris?.small || null;
-        }
-        return null;
-    } catch (error) {
-        console.error('Error fetching MTG card:', error);
-        return null;
-    }
-}
-
 // Create Pokemon card
-async function createPokemonCard(pokemon) {
+function createPokemonCard(pokemon) {
     const card = document.createElement('div');
     card.className = 'pokemon-card';
     
@@ -220,41 +147,39 @@ async function createPokemonCard(pokemon) {
         fairy: '#EE99AC'
     };
 
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-    
-    // Fetch MTG card image
-    const mtgImage = await fetchMTGCard(pokemon.name);
-
     card.innerHTML = `
-        <div class="pokemon-images">
-            <img src="${pokemon.sprites.front_default}" alt="${capitalize(pokemon.name)}" class="pokemon-sprite">
-            ${mtgImage ? `<img src="${mtgImage}" alt="${capitalize(pokemon.name)} MTG Card" class="mtg-card">` : ''}
-        </div>
-        <h2>${capitalize(pokemon.name)}</h2>
+        <img src="${pokemon.sprites.front_default}" alt="${capitalizeFirstLetter(pokemon.name)}">
+        <h2>${capitalizeFirstLetter(pokemon.name)}</h2>
         <div class="type-badges">
             ${pokemon.types.map(type => `
-                <span class="type-badge" style="background-color: ${typeColors[type]}">${capitalize(type)}</span>
+                <span class="type-badge" style="background-color: ${typeColors[type]}">${type}</span>
             `).join('')}
         </div>
         <div class="evolution-chain">
             ${pokemon.evolutionChain.map(evo => `
-                <img src="${evo.sprite}" alt="${capitalize(evo.name)}" title="${capitalize(evo.name)}" data-pokemon-name="${evo.name}">
+                <a href="#" class="evolution-link" data-pokemon="${evo.name}">
+                    <img src="${evo.sprite}" alt="${capitalizeFirstLetter(evo.name)}" title="${capitalizeFirstLetter(evo.name)}">
+                </a>
             `).join('')}
         </div>
     `;
 
-    // Add click handler for the card
-    card.addEventListener('click', () => showPokemonDetails(pokemon));
+    // Add click event for the main card
+    card.addEventListener('click', (e) => {
+        // Don't trigger if clicking on an evolution link
+        if (!e.target.closest('.evolution-link')) {
+            showPokemonDetails(pokemon);
+        }
+    });
 
-    // Add click handlers for evolution chain images
-    const evolutionImages = card.querySelectorAll('.evolution-chain img');
-    evolutionImages.forEach(img => {
-        img.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent card click
-            const pokemonName = img.dataset.pokemonName;
-            const targetPokemon = allPokemon.find(p => p.name === pokemonName);
-            if (targetPokemon) {
-                showPokemonDetails(targetPokemon);
+    // Add click events for evolution links
+    card.querySelectorAll('.evolution-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const evoPokemon = allPokemon.find(p => p.name === link.dataset.pokemon);
+            if (evoPokemon) {
+                showPokemonDetails(evoPokemon);
             }
         });
     });
@@ -264,17 +189,15 @@ async function createPokemonCard(pokemon) {
 
 // Show Pokemon details in modal
 function showPokemonDetails(pokemon) {
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-    
     modalContent.innerHTML = `
-        <h2>${capitalize(pokemon.name)}</h2>
-        <img src="${pokemon.sprites.front_default}" alt="${capitalize(pokemon.name)}" style="width: 150px; display: block; margin: 20px auto;">
+        <h2>${capitalizeFirstLetter(pokemon.name)}</h2>
+        <img src="${pokemon.sprites.front_default}" alt="${capitalizeFirstLetter(pokemon.name)}" style="width: 200px; display: block; margin: 20px auto;">
         <p>${pokemon.description}</p>
         
         <div class="stats-container">
             ${pokemon.stats.map(stat => `
                 <div class="stat-item">
-                    <span>${capitalize(stat.stat.name)}</span>
+                    <span>${capitalizeFirstLetter(stat.stat.name.replace('-', ' '))}</span>
                     <span>${stat.base_stat}</span>
                 </div>
             `).join('')}
@@ -284,7 +207,7 @@ function showPokemonDetails(pokemon) {
         <div class="attacks-list">
             ${pokemon.moves.map(move => `
                 <div class="attack-item">
-                    <span>${capitalize(move.move.name)}</span>
+                    <span>${capitalizeFirstLetter(move.move.name.replace('-', ' '))}</span>
                 </div>
             `).join('')}
         </div>
@@ -292,19 +215,20 @@ function showPokemonDetails(pokemon) {
         <h3>Evolution Chain</h3>
         <div class="evolution-chain">
             ${pokemon.evolutionChain.map(evo => `
-                <img src="${evo.sprite}" alt="${capitalize(evo.name)}" title="${capitalize(evo.name)}" data-pokemon-name="${evo.name}">
+                <a href="#" class="evolution-link" data-pokemon="${evo.name}">
+                    <img src="${evo.sprite}" alt="${capitalizeFirstLetter(evo.name)}" title="${capitalizeFirstLetter(evo.name)}">
+                </a>
             `).join('')}
         </div>
     `;
-    
-    // Add click handlers for evolution chain images in modal
-    const modalEvolutionImages = modalContent.querySelectorAll('.evolution-chain img');
-    modalEvolutionImages.forEach(img => {
-        img.addEventListener('click', () => {
-            const pokemonName = img.dataset.pokemonName;
-            const targetPokemon = allPokemon.find(p => p.name === pokemonName);
-            if (targetPokemon) {
-                showPokemonDetails(targetPokemon);
+
+    // Add click events for evolution links in modal
+    modalContent.querySelectorAll('.evolution-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const evoPokemon = allPokemon.find(p => p.name === link.dataset.pokemon);
+            if (evoPokemon) {
+                showPokemonDetails(evoPokemon);
             }
         });
     });
