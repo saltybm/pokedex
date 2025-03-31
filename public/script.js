@@ -1,7 +1,65 @@
 const POKE_API_BASE_URL = 'https://pokeapi.co/api/v2';
-const SCRYFALL_API_URL = 'https://api.scryfall.com/cards/search';
+const SCRYFALL_API_URL = 'https://api.scryfall.com/cards/named';
 let allPokemon = [];
 let filteredPokemon = [];
+
+// Pokemon to MTG card mapping
+const pokemonToMTG = {
+    'charizard': 'Charizard',
+    'pikachu': 'Pikachu',
+    'mewtwo': 'Mewtwo',
+    'mew': 'Mew',
+    'dragonite': 'Dragonite',
+    'gyarados': 'Gyarados',
+    'lapras': 'Lapras',
+    'snorlax': 'Snorlax',
+    'venusaur': 'Venusaur',
+    'blastoise': 'Blastoise',
+    'alakazam': 'Alakazam',
+    'gengar': 'Gengar',
+    'arcanine': 'Arcanine',
+    'ninetales': 'Ninetales',
+    'raichu': 'Raichu',
+    'machamp': 'Machamp',
+    'golem': 'Golem',
+    'onix': 'Onix',
+    'hitmonlee': 'Hitmonlee',
+    'hitmonchan': 'Hitmonchan',
+    'mr-mime': 'Mr. Mime',
+    'jynx': 'Jynx',
+    'electrode': 'Electrode',
+    'exeggutor': 'Exeggutor',
+    'marowak': 'Marowak',
+    'hitmontop': 'Hitmontop',
+    'lickitung': 'Lickitung',
+    'koffing': 'Koffing',
+    'rhyhorn': 'Rhyhorn',
+    'chansey': 'Chansey',
+    'tangela': 'Tangela',
+    'kangaskhan': 'Kangaskhan',
+    'horsea': 'Horsea',
+    'goldeen': 'Goldeen',
+    'staryu': 'Staryu',
+    'scyther': 'Scyther',
+    'jolteon': 'Jolteon',
+    'electabuzz': 'Electabuzz',
+    'magmar': 'Magmar',
+    'pinsir': 'Pinsir',
+    'tauros': 'Tauros',
+    'ditto': 'Ditto',
+    'eevee': 'Eevee',
+    'porygon': 'Porygon',
+    'omanyte': 'Omanyte',
+    'kabuto': 'Kabuto',
+    'aerodactyl': 'Aerodactyl',
+    'articuno': 'Articuno',
+    'zapdos': 'Zapdos',
+    'moltres': 'Moltres',
+    'dratini': 'Dratini',
+    'dragonair': 'Dragonair',
+    'mewtwo': 'Mewtwo',
+    'mew': 'Mew'
+};
 
 // DOM Elements
 const pokemonGrid = document.getElementById('pokemonGrid');
@@ -70,9 +128,6 @@ async function fetchPokemonDetails(url) {
             evolutionChain = await processEvolutionChain(evolutionData.chain);
         }
 
-        // Fetch MTG card data
-        const mtgCard = await fetchMTGCard(data.name);
-
         return {
             id: data.id,
             name: data.name,
@@ -82,34 +137,12 @@ async function fetchPokemonDetails(url) {
             height: data.height,
             weight: data.weight,
             abilities: data.abilities,
-            moves: data.moves.slice(0, 5),
+            moves: data.moves.slice(0, 5), // Get first 5 moves
             evolutionChain,
-            description: speciesData.flavor_text_entries.find(entry => entry.language.name === 'en')?.flavor_text || '',
-            mtgCard
+            description: speciesData.flavor_text_entries.find(entry => entry.language.name === 'en')?.flavor_text || ''
         };
     } catch (error) {
         console.error('Error fetching Pokemon details:', error);
-        return null;
-    }
-}
-
-// Fetch MTG card data
-async function fetchMTGCard(pokemonName) {
-    try {
-        // Search for Pokemon-themed cards
-        const response = await fetch(`${SCRYFALL_API_URL}?q=name:${encodeURIComponent(pokemonName)}`);
-        const data = await response.json();
-        
-        if (data.data && data.data.length > 0) {
-            // Get the first matching card
-            return {
-                name: data.data[0].name,
-                imageUrl: data.data[0].image_uris?.small || null
-            };
-        }
-        return null;
-    } catch (error) {
-        console.error('Error fetching MTG card:', error);
         return null;
     }
 }
@@ -142,8 +175,27 @@ function displayPokemon() {
     });
 }
 
+// Fetch MTG card image
+async function fetchMTGCard(pokemonName) {
+    try {
+        const mtgName = pokemonToMTG[pokemonName.toLowerCase()];
+        if (!mtgName) return null;
+
+        const response = await fetch(`${SCRYFALL_API_URL}?exact=${encodeURIComponent(mtgName)}`);
+        const data = await response.json();
+        
+        if (data.object === 'card') {
+            return data.image_uris?.small || null;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching MTG card:', error);
+        return null;
+    }
+}
+
 // Create Pokemon card
-function createPokemonCard(pokemon) {
+async function createPokemonCard(pokemon) {
     const card = document.createElement('div');
     card.className = 'pokemon-card';
     
@@ -169,13 +221,14 @@ function createPokemonCard(pokemon) {
     };
 
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+    
+    // Fetch MTG card image
+    const mtgImage = await fetchMTGCard(pokemon.name);
 
     card.innerHTML = `
         <div class="pokemon-images">
             <img src="${pokemon.sprites.front_default}" alt="${capitalize(pokemon.name)}" class="pokemon-sprite">
-            ${pokemon.mtgCard ? `
-                <img src="${pokemon.mtgCard.imageUrl}" alt="${pokemon.mtgCard.name}" class="mtg-card" title="${pokemon.mtgCard.name}">
-            ` : ''}
+            ${mtgImage ? `<img src="${mtgImage}" alt="${capitalize(pokemon.name)} MTG Card" class="mtg-card">` : ''}
         </div>
         <h2>${capitalize(pokemon.name)}</h2>
         <div class="type-badges">
