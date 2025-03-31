@@ -213,4 +213,26 @@ h1 {
     margin-bottom: 0.5rem;
     border-radius: 8px;
     font-size: 0.875rem;
+}
+
+.audio-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 1.2em;
+    vertical-align: middle;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.audio-button:hover {
+    color: #333;
+}
+
+.pokemon-name-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 } 

@@ -121,6 +121,14 @@ function displayPokemon() {
     });
 }
 
+// Add speech synthesis function
+function speakPokemonName(name) {
+    const utterance = new SpeechSynthesisUtterance(capitalizeFirstLetter(name));
+    utterance.lang = 'en-US';
+    utterance.rate = 0.8;
+    window.speechSynthesis.speak(utterance);
+}
+
 // Create Pokemon card
 function createPokemonCard(pokemon) {
     const card = document.createElement('div');
@@ -149,7 +157,10 @@ function createPokemonCard(pokemon) {
 
     card.innerHTML = `
         <img src="${pokemon.sprites.front_default}" alt="${capitalizeFirstLetter(pokemon.name)}">
-        <h2>${capitalizeFirstLetter(pokemon.name)}</h2>
+        <div class="pokemon-name-container">
+            <h2>${capitalizeFirstLetter(pokemon.name)}</h2>
+            <button class="audio-button" title="Pronounce name">🔊</button>
+        </div>
         <div class="type-badges">
             ${pokemon.types.map(type => `
                 <span class="type-badge" style="background-color: ${typeColors[type]}">${type}</span>
@@ -164,10 +175,17 @@ function createPokemonCard(pokemon) {
         </div>
     `;
 
+    // Add click event for the audio button
+    const audioButton = card.querySelector('.audio-button');
+    audioButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakPokemonName(pokemon.name);
+    });
+
     // Add click event for the main card
     card.addEventListener('click', (e) => {
-        // Don't trigger if clicking on an evolution link
-        if (!e.target.closest('.evolution-link')) {
+        // Don't trigger if clicking on an evolution link or audio button
+        if (!e.target.closest('.evolution-link') && !e.target.closest('.audio-button')) {
             showPokemonDetails(pokemon);
         }
     });
@@ -190,7 +208,10 @@ function createPokemonCard(pokemon) {
 // Show Pokemon details in modal
 function showPokemonDetails(pokemon) {
     modalContent.innerHTML = `
-        <h2>${capitalizeFirstLetter(pokemon.name)}</h2>
+        <div class="pokemon-name-container">
+            <h2>${capitalizeFirstLetter(pokemon.name)}</h2>
+            <button class="audio-button" title="Pronounce name">🔊</button>
+        </div>
         <img src="${pokemon.sprites.front_default}" alt="${capitalizeFirstLetter(pokemon.name)}" style="width: 200px; display: block; margin: 20px auto;">
         <p>${pokemon.description}</p>
         
@@ -221,6 +242,13 @@ function showPokemonDetails(pokemon) {
             `).join('')}
         </div>
     `;
+
+    // Add click event for the audio button in modal
+    const modalAudioButton = modalContent.querySelector('.audio-button');
+    modalAudioButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakPokemonName(pokemon.name);
+    });
 
     // Add click events for evolution links in modal
     modalContent.querySelectorAll('.evolution-link').forEach(link => {
