@@ -75,20 +75,33 @@ h1 {
 
 .pokemon-card {
     background: white;
-    border-radius: 16px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    overflow: hidden;
 }
 
 .pokemon-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border: 2px solid #FFD700;
+    animation: goldenGlow 2s infinite;
+}
+
+@keyframes goldenGlow {
+    0% {
+        box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700;
+    }
+    50% {
+        box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
+    }
+    100% {
+        box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700;
+    }
 }
 
 .pokemon-card img {
